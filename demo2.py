@@ -62,7 +62,7 @@ def Counting_People(yolo):
 		w = int(video_capture.get(3))
 		h = int(video_capture.get(4))
 		fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-		out = cv2.VideoWriter('output1.avi', fourcc, 15, (w, h))
+		out = cv2.VideoWriter('output.avi', fourcc, 15, (w, h))
 		list_file = open('detection.txt', 'w')
 		frame_index = -1
 
@@ -92,13 +92,16 @@ def Counting_People(yolo):
 		# print("box_num",len(boxs))
 		boxss = []
 		labels = []
+		scoress = []
 		for box in boxs:
 			boxss.append(box[0:4])
 			labels.append(box[4])
+			scoress.append(box[5])
+			
 		features = encoder(frame, boxss)
 
 		# score to 1.0 here).
-		detections = [Detection(bbox, 1.0, feature, label) for bbox, feature, label in zip(boxss, features, labels)]
+		detections = [Detection(bbox, 1.0, feature, label, score) for bbox, feature, label, score in zip(boxss, features, labels, scoress)]
 
 		# Run non-maxima suppression.
 		boxes = np.array([d.tlwh for d in detections])
@@ -177,14 +180,14 @@ def Counting_People(yolo):
 
 			cv2.circle(frame, (xMid, yMid), 5, (0,0,255), 5)
 			cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 255, 255), 2)
-			cv2.putText(frame, str(track.track_id)+ ' ' + str(class_name), (int(bbox[0]), int(bbox[1])), 0, 5e-3 * 200, (0, 255, 0), 2)
+			cv2.putText(frame, str(track.track_id)+ ' ' + str(class_name)+' '+str("{:.2f}".format(track.score)), (int(bbox[0]), int(bbox[1])), 0, 5e-3 * 150, (0, 255, 0), 2)
 			#cv2.putText(frame, 'Total Vehicles: {}.'.format(vehicle), (450, 50), cv2.FONT_HERSHEY_PLAIN, 2, (255,255,255), 2)
 
-			cv2.putText(frame, "Up", (70, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0,0,255), 1)
-			cv2.putText(frame, "Down", (100, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0,0,255), 1)
-			cv2.putText(frame, "Car:        "+str(up_list[1])+"     "+ str(down_list[1]), (20, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0,0,255), 1)
-			cv2.putText(frame, "Motor:      "+str(up_list[0])+"     "+ str(down_list[0]), (20, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0,0,255), 1)
-			cv2.putText(frame, "Truck:      "+str(up_list[2])+"     "+ str(down_list[2]), (20, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0,0,255), 1)
+			cv2.putText(frame, "Up", (70, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 1)
+			cv2.putText(frame, "Down", (120, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 1)
+			cv2.putText(frame, "Car:        "+str(up_list[1])+"     "+ str(down_list[1]), (20, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,255), 1)
+			cv2.putText(frame, "Motor:      "+str(up_list[0])+"     "+ str(down_list[0]), (20, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,255), 1)
+			cv2.putText(frame, "Truck:      "+str(up_list[2])+"     "+ str(down_list[2]), (20, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,255), 1)
 
 			track_list.append((track.track_id, track.label))
 

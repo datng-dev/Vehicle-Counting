@@ -113,7 +113,7 @@ class YOLO(object):
                     c= int(3)
                 else:
                     c= int(4)
-               # score = out_scores[i]
+                score = out_scores[i]
                 x = int(box[1])
                 y = int(box[0])
                 w = int(box[3]-box[1])
@@ -124,7 +124,7 @@ class YOLO(object):
                 if y < 0 :
                     h = h + y
                     y = 0
-                return_boxs.append([x,y,w,h,c])
+                return_boxs.append([x,y,w,h,c, score])
                 # return_class_name.append([predicted_class])
 
         return return_boxs
